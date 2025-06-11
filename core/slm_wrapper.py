@@ -34,7 +34,7 @@ class SLMWrapper:
             response = response[7:-3].strip()
 
             parsed = json.loads(response)
-            print(parsed)
+            # print(parsed)
             if parsed.get("compliant") == "true":
                 return "compliant"
             elif parsed.get("compliant") == "false":
