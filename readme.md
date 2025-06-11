@@ -1,4 +1,4 @@
-# Judge 🥶
+# Judge
 
 **Judge** is a guardrail system designed to evaluate user prompts against safety policies using Small Language Models (SLMs). It parses logical policy expressions, invokes SLMs for evaluation, and determines if a prompt is compliant or in violation.
 
