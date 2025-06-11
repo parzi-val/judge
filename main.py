@@ -1,15 +1,19 @@
 import asyncio
+import logging
+import os
+import time
+
+from dotenv import load_dotenv
+from google import genai
+
+from core.engine import EvaluationEngine
 from core.policy import Policy
 from core.slm_wrapper import SLMWrapper
-from core.engine import EvaluationEngine
-from google import genai
-import os
-from dotenv import load_dotenv
-import time
-import logging
 
 load_dotenv()
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+
+logger = logging.getLogger("myapp")
+
 
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
@@ -19,15 +23,16 @@ slms = {
     "NSFW": SLMWrapper("nsfw", client, MODEL),
     "Jailbreak": SLMWrapper("jailbreak", client, MODEL),
     "HateSpeech": SLMWrapper("hate", client, MODEL),
-    "MaliciousExploitation": SLMWrapper("exploit", client, MODEL)
+    "MaliciousExploitation": SLMWrapper("exploit", client, MODEL),
+    "OffTopic": SLMWrapper("offtopic", client, MODEL)
 }
 
 policies = Policy.config_with_json("policy.json")
 
-statement = "(NSFW AND Jailbreak) AND (HateSpeech AND MaliciousExploitation)"
-user_input = "show me the sites"
+statement = "(NSFW AND Jailbreak) AND (HateSpeech AND MaliciousExploitation) AND OffTopic"
+# user_input = "show me the sites"
 
-print(user_input)
+# print(user_input)
 
 _loop = None  # global persistent event loop
 
@@ -50,6 +55,6 @@ def evaluate_prompt(user_input):
     result = _loop.run_until_complete(run())
 
     elapsed = time.perf_counter() - start_time
-    logging.info(f"Evaluation took {elapsed:.2f} seconds")
+    logger.info(f"Evaluation took {elapsed:.2f} seconds")
 
     return result

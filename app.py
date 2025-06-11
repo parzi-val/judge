@@ -1,18 +1,9 @@
 import streamlit as st
+
 from main import evaluate_prompt
 
 st.set_page_config(page_title="Judge Guardrail", page_icon="🧑‍⚖️")
 st.title("🧑‍⚖️ Judge - Prompt Guardrail")
-
-# Simulate the SLM evaluation function (replace with actual implementation)
-# def evaluate_prompt(prompt: str):
-#     # Example mocked response structure
-#     return {
-#         "nsfw": True,
-#         "jailbreak": True,
-#         "hate": False,
-#         "exploit": False
-#     }
 
 # Mapping for colors
 policy_colors = {
@@ -21,7 +12,7 @@ policy_colors = {
     None: "#251f1f"    # Neutral / Pending
 }
 
-policy_names = ["nsfw", "jailbreak", "hate", "exploit"]
+policy_names = ["nsfw", "jailbreak", "hate", "exploit", "offtopic"]
 
 # Session state for messages
 if "messages" not in st.session_state:
@@ -58,7 +49,7 @@ if prompt := st.chat_input("Enter your prompt here..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.latest_evals = results
 
-    status = [f"{k}" for k,v in results.items() if v is not "compliant"]
+    status = [f"{k}" for k,v in results.items() if v != "compliant"]
 
     assistant_response = f"Failed to comply: {', '.join(status)}." if status else "Compliant."
 

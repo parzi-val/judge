@@ -1,5 +1,7 @@
-from core.prompt import MASTER_PROMPT
 import json
+
+from core.prompt import MASTER_PROMPT
+
 
 class Policy:
     def __init__(self, name: str, alias: str, instruction: str):
@@ -17,7 +19,7 @@ class Policy:
         return f"Policy: {self.name}"
     
     def config_with_json(filename)-> dict[str, "Policy"]:
-        with open(filename,"r+") as file:
+        with open(filename,"r+",encoding='utf8') as file:
             policies = json.load(file)["policies"]
     
         config = {

@@ -1,7 +1,12 @@
-from core.policy import Policy
 import json
+import logging
+
 from google import genai
 from pydantic import BaseModel
+
+from core.policy import Policy
+
+logger = logging.getLogger("myapp")
 
 
 class Compliance(BaseModel):
@@ -34,6 +39,9 @@ class SLMWrapper:
             response = response[7:-3].strip()
 
             parsed = json.loads(response)
+
+            logger.info(f"{self.name} --> {parsed['compliant']}, reason: {parsed['violation_reason']}")
+
             # print(parsed)
             if parsed.get("compliant") == "true":
                 return "compliant"
