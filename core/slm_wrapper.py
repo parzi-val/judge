@@ -34,10 +34,10 @@ class SLMWrapper:
             response = response[7:-3].strip()
 
             parsed = json.loads(response)
-            print(self.name, parsed)
+            print(parsed)
             if parsed.get("compliant") == "true":
                 return "compliant"
-            elif not parsed.get("compliant") == "false":
+            elif parsed.get("compliant") == "false":
                 return "violation"
             else:
                 return "unknown"

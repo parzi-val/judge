@@ -21,9 +21,9 @@ class EvaluationNode:
 
 
 class EvaluationEngine:
-    def __init__(self, user_input: str):
-        self.user_input = user_input
+    def __init__(self):
         self.root: Optional[EvaluationNode] = None
+        self.result_map: dict[str, str] = {}
 
     def construct_tree_from_statement(self, statement: str, policy_map: dict[str, Policy], slm_map: dict[str, SLMWrapper]):
         """
@@ -83,21 +83,23 @@ class EvaluationEngine:
         self.root = build_expression_tree(tokens)
         logging.info("Evaluation tree constructed from logical statement.")
 
-    async def _evaluate_node(self, node: EvaluationNode) -> str:
+    async def _evaluate_node(self, node: EvaluationNode, user_input) -> str:
         if node is None:
             return "unknown"
 
         if node.is_leaf():
             logging.info(f"Evaluating SLM node: {node.value.name} for policy '{node.policy.name}'")
-            policy_name, result = await node.value(node.policy, self.user_input)
+            policy_name, result = await node.value(node.policy, user_input)
             node.result = result
+            self.result_map[node.value.name] = result
+
             logging.info(f"Result from SLM '{node.value.name}': {result}")
             return result
 
         logging.info(f"Evaluating operator node: '{node.value}'")
 
-        left_task = asyncio.create_task(self._evaluate_node(node.left)) if node.left else None
-        right_task = asyncio.create_task(self._evaluate_node(node.right)) if node.right else None
+        left_task = asyncio.create_task(self._evaluate_node(node.left, user_input)) if node.left else None
+        right_task = asyncio.create_task(self._evaluate_node(node.right,user_input)) if node.right else None
 
         left_result = await left_task if left_task else None
         right_result = await right_task if right_task else None
@@ -117,10 +119,10 @@ class EvaluationEngine:
         logging.info(f"Result of node '{logic}': {node.result}")
         return node.result
 
-    async def evaluate(self) -> str:
+    async def evaluate(self, user_input) -> str:
         if not self.root:
             raise ValueError("Evaluation tree not initialized.")
         logging.info("Starting evaluation of the tree...")
-        result = await self._evaluate_node(self.root)
+        result = await self._evaluate_node(self.root, user_input)
         logging.info(f"Final decision: {result.upper()}")
-        return result
+        return result, self.result_map 
