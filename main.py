@@ -5,7 +5,11 @@ from core.engine import EvaluationEngine
 from google import genai
 import os
 from dotenv import load_dotenv
+import time
+import logging
+
 load_dotenv()
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
@@ -41,4 +45,11 @@ def evaluate_prompt(user_input):
         _loop = asyncio.new_event_loop()
         asyncio.set_event_loop(_loop)
 
-    return _loop.run_until_complete(run())
+    start_time = time.perf_counter()
+
+    result = _loop.run_until_complete(run())
+
+    elapsed = time.perf_counter() - start_time
+    logging.info(f"Evaluation took {elapsed:.2f} seconds")
+
+    return result
