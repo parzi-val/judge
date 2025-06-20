@@ -18,7 +18,6 @@
 - [Extending the System](#extending-the-system)
 - [Usage Instructions](#usage-instructions)
 - [Glossary](#glossary)
-- [Notes for Confluence](#notes-for-confluence)
 
 ---
 
@@ -37,9 +36,6 @@ It helps prevent:
 - Hate speech and discrimination
 - Malicious use and social engineering
 - Off-topic or irrelevant queries
-
-> _[Note for Confluence: This section can be summarized as "Motivation" or "Why this project matters"]_
-
 ---
 
 ## Core Concepts & Architecture
@@ -71,8 +67,15 @@ The tree is constructed via a custom Shunting-yard parser that respects logical 
 NOT > AND > OR
 ```
 
-> _![Insert: Mermaid diagram of binary tree parsing from (A AND B) OR C]_\
-> _[Note for Confluence: Add collapsible explanation of Shunting-yard parsing]_
+#### Binary Tree for `(PolicyA AND PolicyB) OR PolicyC]`
+
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/parzi-val/judge/main/resources/tree.png" width="360">
+</p>
+
+
+
 
 ### Parallel Evaluation
 
@@ -89,7 +92,9 @@ Total Latency ≈ max(SLM call time), not sum
 ```
 
 ---
-
+#### Architecture Diagram
+![architecture diagram](https://raw.githubusercontent.com/parzi-val/judge/refs/heads/main/resources/arch.png)
+---
 ## Key Modules Explained
 
 ### `core/engine.py`
@@ -156,10 +161,7 @@ Total Latency ≈ max(SLM call time), not sum
 
 ### Meta-Policies
 
-Judge supports content-routing and behavior-layer policies too (e.g., OffTopic).
-
-> _[Note for Confluence: Consider making this its own "How to Extend" section]_
-
+- Judge supports content-routing and behavior-layer policies too (e.g., OffTopic).
 ---
 
 ## Usage Instructions
@@ -179,9 +181,6 @@ streamlit run app.py
 ```
 
 5. **Test prompts** and view real-time evaluations
-
-> _[Note for Confluence: This block can be collapsed or made a sidebar tip]_
-
 ---
 
 ## Glossary
@@ -196,15 +195,4 @@ streamlit run app.py
 | Logical Statement | Boolean expression combining multiple policies (e.g., A AND B OR C) |
 
 ---
-
-## Notes for Confluence
-
-- Add diagrams: Binary tree parsing, async evaluation flow
-- Use collapsible blocks for module explanations
-- Turn glossary into expandable Confluence macro
-- Highlight `policy.json` schema as a code snippet
-- Consider including an "Example Output" section from SLMWrapper
-
----
-
 For source code, see: [github.com/parzi-val/judge](https://github.com/parzi-val/judge)
