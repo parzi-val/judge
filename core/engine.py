@@ -83,13 +83,13 @@ class EvaluationEngine:
         self.root = build_expression_tree(tokens)
         logger.info("Evaluation tree constructed from logical statement.")
 
-    async def _evaluate_node(self, node: EvaluationNode, user_input) -> str:
+    async def _evaluate_node(self, node: EvaluationNode, user_input, context: dict = None) -> str:
         if node is None:
             return "unknown"
 
         if node.is_leaf():
             logger.info(f"Evaluating SLM node: {node.value.name} for policy '{node.policy.name}'")
-            policy_name, result = await node.value(node.policy, user_input)
+            policy_name, result = await node.value(node.policy, user_input, context=context)
             node.result = result
             self.result_map[node.value.name] = result
 
@@ -98,8 +98,8 @@ class EvaluationEngine:
 
         logger.info(f"Evaluating operator node: '{node.value}'")
 
-        left_task = asyncio.create_task(self._evaluate_node(node.left, user_input)) if node.left else None
-        right_task = asyncio.create_task(self._evaluate_node(node.right,user_input)) if node.right else None
+        left_task = asyncio.create_task(self._evaluate_node(node.left, user_input, context)) if node.left else None
+        right_task = asyncio.create_task(self._evaluate_node(node.right, user_input, context)) if node.right else None
 
         left_result = await left_task if left_task else None
         right_result = await right_task if right_task else None
@@ -119,10 +119,10 @@ class EvaluationEngine:
         logger.info(f"Result of node '{logic}': {node.result}")
         return node.result
 
-    async def evaluate(self, user_input) -> str:
+    async def evaluate(self, user_input, context: dict = None) -> str:
         if not self.root:
             raise ValueError("Evaluation tree not initialized.")
         logger.info("Starting evaluation of the tree...")
-        result = await self._evaluate_node(self.root, user_input)
+        result = await self._evaluate_node(self.root, user_input, context)
         logger.info(f"Final decision: {result.upper()}")
         return result, self.result_map 

@@ -20,10 +20,10 @@ class SLMWrapper:
         self.client = client  # this can be the SDK instance
         self.model = model
 
-    async def evaluate_policy(self, policy: Policy, user_input: str) -> str:
-        prompt = policy(user_input)
+    async def evaluate_policy(self, policy: Policy, user_input: str, context: dict = None) -> str:
+        prompt = policy(user_input, context=context)
         response = await self.client.aio.models.generate_content(
-            model=self.model, 
+            model=self.model,
             contents=[prompt],
             # config={
             #     "response_mime_type": "application/json",
@@ -42,10 +42,18 @@ class SLMWrapper:
 
             logger.info(f"{self.name} --> {parsed['compliant']}, reason: {parsed['violation_reason']}")
 
-            # print(parsed)
-            if parsed.get("compliant") == "true":
+            # Handle both string ("true"/"false") and boolean (True/False) responses
+            compliant_value = parsed.get("compliant")
+
+            # Convert to lowercase string for comparison
+            if isinstance(compliant_value, bool):
+                compliant_str = str(compliant_value).lower()
+            else:
+                compliant_str = str(compliant_value).lower()
+
+            if compliant_str == "true":
                 return "compliant"
-            elif parsed.get("compliant") == "false":
+            elif compliant_str == "false":
                 return "violation"
             else:
                 return "unknown"
@@ -53,5 +61,5 @@ class SLMWrapper:
             return "unknown"
 
 
-    async def __call__(self, policy: Policy, user_input: str) -> str:
-        return await self.evaluate_policy(policy, user_input)
+    async def __call__(self, policy: Policy, user_input: str, context: dict = None) -> str:
+        return await self.evaluate_policy(policy, user_input, context=context)

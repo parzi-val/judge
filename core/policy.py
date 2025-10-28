@@ -9,11 +9,15 @@ class Policy:
         self.alias = alias
         self.instruction = instruction
 
-    def __call__(self, user_input: str) -> str:
+    def __call__(self, user_input: str, context: dict = None) -> str:
+        context_str = ""
+        if context:
+            context_str = "\n\nCONTEXT:\n" + "\n".join([f"- {k}: {v}" for k, v in context.items()])
+
         return MASTER_PROMPT.format(
                     policy_instruction=self.instruction,
                     text_to_check=user_input
-                )
+                ) + context_str
     
     def __repr__(self):
         return f"Policy: {self.name}"
